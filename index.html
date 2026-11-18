@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>پایپ‌لاین در پردازنده</title>
+<style>
+:root{--bg:#070713;--card:rgba(255,255,255,.05);--fg:#eef0ff;--mut:#a3a5cb;--a:#fbbf24;--b:#2dd4bf;--line:rgba(255,255,255,.12);--glow:.35;--dx:-1;--bd:270deg;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root{--bg:#f3f2ff;--card:rgba(255,255,255,.78);--fg:#171633;--mut:#5d5f86;--a:#b45309;--b:#0f766e;--line:rgba(60,50,140,.16);--glow:.12;color-scheme:light}}
+html[dir=ltr]{--dx:1;--bd:90deg}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:Vazirmatn,Tahoma,"Segoe UI",system-ui,sans-serif;line-height:1.7;overflow:hidden;position:relative}
+html[lang=en] body{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.6}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(40vmax 40vmax at 15% 10%,var(--a),transparent 70%),radial-gradient(36vmax 36vmax at 95% 95%,var(--b),transparent 70%);opacity:var(--glow);animation:drift 14s ease-in-out infinite alternate}
+body::after{content:"";position:fixed;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:56px 56px;opacity:.35;-webkit-mask-image:radial-gradient(ellipse at center,#000 30%,transparent 80%);mask-image:radial-gradient(ellipse at center,#000 30%,transparent 80%)}
+@keyframes drift{to{transform:scale(1.15) translate(2%,2%)}}
+.deck{height:100%;position:relative;z-index:2}
+.slide{--c:var(--a);position:absolute;inset:0;display:flex;flex-direction:column;justify-content:safe center;padding:8vh 8vw 12vh;overflow-y:auto;opacity:0;visibility:hidden;transform:translateX(calc(var(--dx)*50px)) scale(.98);transition:opacity .5s,transform .5s,visibility .5s}
+.slide[data-s=B]{--c:var(--b)}
+.slide.on{opacity:1;visibility:visible;transform:none}
+.slide.past{transform:translateX(calc(var(--dx)*-50px)) scale(.98)}
+.g{background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+h1{font-size:clamp(2.1rem,6.5vw,4.4rem);margin:0 0 1rem;line-height:1.3}
+h2{font-size:clamp(1.45rem,3.6vw,2.5rem);margin:0 0 1.1rem;line-height:1.35}
+.sub{color:var(--mut);font-size:clamp(1rem,2vw,1.4rem);max-width:40ch}
+ul{list-style:none;padding:0;margin:0;display:grid;gap:.6rem;max-width:62rem}
+li{font-size:clamp(.94rem,1.7vw,1.22rem);background:var(--card);border:1px solid var(--line);border-inline-start:3px solid var(--c);border-radius:14px;padding:.65rem 1rem;backdrop-filter:blur(10px);opacity:0;transform:translateY(16px)}
+li b,.card b{color:var(--c)}
+.on li{animation:up .55s forwards;animation-delay:calc(.15s + var(--i)*.1s)}
+@keyframes up{to{opacity:1;transform:none}}
+.on .cards,.on .scroll,.on .chain,.on .math,.on .ex,.on .refs{animation:fade .7s .2s both}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}}
+ul+.cards,ul+.scroll,ul+.chain,ul+.math,.cards+.ex,.scroll+.ex,.chain+.ex,.math+.ex{margin-top:1rem}
+.chain+.cards{margin-top:1rem}
+.ex{margin-top:1rem;color:var(--mut);font-size:clamp(.9rem,1.6vw,1.1rem);max-width:62rem}.ex b{color:var(--c)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:.8rem;max-width:68rem}
+.card{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--c);border-radius:16px;padding:.9rem 1.1rem;font-size:clamp(.85rem,1.5vw,1.02rem);line-height:1.65;backdrop-filter:blur(10px)}
+.card h3{margin:0 0 .35rem;color:var(--c);font-size:1.15em}
+.card svg{display:block;width:100%;height:auto;max-height:100px;margin-bottom:.4rem}
+.chain{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;max-width:66rem}
+.chain b{color:var(--b);font-weight:400;font-size:1.2rem}
+.chain b::before{content:"←"}
+html[dir=ltr] .chain b::before{content:"→"}
+.chain span{background:var(--card);border:1px solid var(--c);border-radius:10px;padding:.35rem .75rem;font-size:clamp(.82rem,1.5vw,1.02rem)}
+.chain span.d{border-color:var(--b)}
+.scroll{overflow-x:auto;max-width:100%}
+table{border-collapse:separate;border-spacing:5px;font-size:clamp(.82rem,1.6vw,1.08rem)}
+td,th{padding:.5rem .9rem;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:10px}
+th{color:var(--c);font-weight:700;border-color:var(--c)}
+td:first-child{font-weight:700;color:var(--mut)}
+td.st{border-color:var(--c);color:var(--fg);font-weight:600}
+td.e{background:none;border-color:transparent}
+.math{direction:ltr;text-align:left;font-family:"Cambria Math",Cambria,Georgia,serif;font-style:italic;font-size:clamp(1rem,2.3vw,1.6rem);padding:.8rem 1.3rem;border-radius:14px;border:1px solid var(--line);background:var(--card);overflow-x:auto;max-width:36rem}
+.rh{margin:1.3rem 0 .2rem;color:var(--mut);font-size:1rem}
+.slide[data-s=R] h1{font-size:clamp(1.8rem,5vw,3.2rem);margin-bottom:.2rem}
+.refs{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:.5rem .8rem;max-width:68rem;margin-top:.6rem}
+.refs a,.refs div{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.45rem .8rem;font-size:clamp(.74rem,1.3vw,.92rem);line-height:1.5;color:var(--fg);text-decoration:none;overflow-wrap:anywhere;backdrop-filter:blur(8px)}
+.refs a:hover{border-color:var(--b)}
+.refs b{display:block;color:var(--b);font-weight:600;font-size:.82em}
+.refs i{display:block;font-style:normal;color:var(--mut);direction:ltr;text-align:left;font-size:.85em}
+.bar{position:fixed;inset-inline-start:0;top:0;height:4px;width:0;background:linear-gradient(var(--bd),var(--a),var(--b));box-shadow:0 0 12px var(--b);transition:width .3s;z-index:5}
+.nav{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom,0px));inset-inline-end:18px;display:flex;gap:8px;align-items:center;color:var(--mut);font-size:.9rem;z-index:5}
+.ctl{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));inset-inline-end:16px;z-index:6}
+.nav button,.ctl button{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:12px;font:inherit;cursor:pointer;backdrop-filter:blur(8px)}
+.nav button{width:40px;height:40px;font-size:1.1rem}
+.ctl button{padding:.45rem .9rem;font-size:.85rem}
+.nav button:hover,.ctl button:hover{border-color:var(--b)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,body::before{animation:none!important;transition:none!important}li,.cards,.scroll,.chain,.math,.ex,.refs{opacity:1!important;transform:none!important}}
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+<div class="ctl"><button id="lg"></button></div>
+<main class="deck" id="deck"></main>
+<div class="nav"><button id="prev"></button><span id="count"></span><button id="next"></button></div>
+<script>
+function C(a){return '<div class="cards">'+a.map(function(c){return '<div class="card">'+(c[2]||'')+'<h3>'+c[0]+'</h3>'+c[1]+'</div>'}).join('')+'</div>'}
+function CH(a,cl){return '<div class="chain">'+a.map(function(x,k){return (k?'<b></b>':'')+'<span'+(cl&&cl[k]?' class="'+cl[k]+'"':'')+'>'+x+'</span>'}).join('')+'</div>'}
+function TB(r){return '<div class="scroll"><table><tr>'+r[0].map(function(h){return '<th>'+h+'</th>'}).join('')+'</tr>'+r.slice(1).map(function(w){return '<tr>'+w.map(function(c){return '<td>'+c+'</td>'}).join('')+'</tr>'}).join('')+'</table></div>'}
+function M(x){return '<div class="math">'+x+'</div>'}
+var T={fa:{thx:'از توجه شما سپاسگزاریم',ref:'منابع استفاده‌شده',v:'ویدیو',w:'وب',b:'کتاب / مقاله',tog:'English',nx:'←',pv:'→',nxl:'بعدی',pvl:'قبلی'},en:{thx:'Thank you',ref:'References used',v:'Video',w:'Web',b:'Book / Paper',tog:'فارسی',nx:'→',pv:'←',nxl:'Next',pvl:'Previous'}};
+var ST=['IF','ID','EX','MEM','WB'];
+function PT(l){var h='<div class="scroll"><table><tr><th>'+l+'</th>';for(var c=1;c<=8;c++)h+='<th>'+c+'</th>';h+='</tr>';for(var r=0;r<4;r++){h+='<tr><td>I'+(r+1)+'</td>';for(var c=0;c<8;c++){var k=c-r;h+=k>=0&&k<5?'<td class="st">'+ST[k]+'</td>':'<td class="e"></td>'}h+='</tr>'}return h+'</table></div>'}
+var FA=[
+{s:'T',t:'<span class="g">پایپ‌لاین (Pipeline) در پردازنده</span>',sub:'اجرای هم‌پوشان دستورها: ایده، مراحل، مخاطرات و راه‌حل‌ها'},
+{t:'ایدهٔ اصلی پایپ‌لاین',p:['اجرای هر دستور را به چند <b>مرحلهٔ مستقل</b> تقسیم می‌کنیم و هر مرحله را در یک واحد سخت‌افزاری جدا انجام می‌دهیم','هم‌زمان با اجرای مرحلهٔ بعدی یک دستور، مرحلهٔ اول دستور بعدی شروع می‌شود؛ پس چند دستور هم‌زمان در مراحل مختلف‌اند','<b>تشبیه خط تولید یا رخت‌شویی:</b> اگر شستن، خشک کردن و تا کردن هر کدام یک ساعت طول بکشد، بدون هم‌پوشانی ۳ بار لباس ۹ ساعت می‌برد؛ با هم‌پوشانی ۵ ساعت','زمان کامل شدن <b>یک</b> دستور (تأخیر) کم نمی‌شود، اما تعداد دستورهای کامل‌شده در واحد زمان (توان عملیاتی) بیشتر می‌شود']},
+{t:'پایپ‌لاین پنج‌مرحله‌ای کلاسیک (RISC)',s:'B',e:C([['IF: واکشی دستور','شمارندهٔ برنامه آدرس را به حافظهٔ دستور (کش) می‌دهد، دستور خوانده می‌شود و PC به دستور بعدی می‌رود.'],['ID: رمزگشایی','واحد کنترل کد عمل را تشخیص می‌دهد و ثبات‌های مبدأ از مجموعهٔ ثبات‌ها خوانده می‌شوند.'],['EX: اجرا','ALU عمل محاسبه یا منطقی را انجام می‌دهد، یا برای بارگذاری و ذخیره آدرس حافظه را (پایه + جابه‌جایی) می‌سازد، یا شرط پرش را بررسی می‌کند.'],['MEM: دسترسی به حافظه','بارگذاری از حافظهٔ داده می‌خواند و ذخیره در آن می‌نویسد؛ دستورهای دیگر بدون کار از این مرحله می‌گذرند.'],['WB: بازنویسی','نتیجهٔ ALU یا داده‌ٔ خوانده‌شده در ثبات مقصد نوشته می‌شود.']]),raw:CH(['IF: واکشی دستور','ID: رمزگشایی و خواندن ثبات‌ها','EX: اجرا در ALU یا محاسبهٔ آدرس','MEM: دسترسی به حافظه','WB: نوشتن نتیجه در ثبات']),x:'بین هر دو مرحله «ثبات‌های پایپ‌لاین» قرار دارند که نتیجهٔ مرحله را تا سیکل بعد نگه می‌دارند. طول سیکل ساعت باید برابر کندترین مرحله به‌علاوهٔ سربار ثبات‌ها باشد؛ بنابراین مرحله‌ها باید تا حد امکان هم‌اندازه باشند.'},
+{t:'نمودار زمانی',raw:PT('سیکل'),x:'۴ دستور در ۸ سیکل تمام می‌شوند؛ بدون پایپ‌لاین ۲۰ سیکل (۴×۵) لازم بود. از سیکل ۵ به بعد در هر سیکل یک دستور کامل می‌شود.'},
+{t:'سنجش بهبود عملکرد',s:'B',p:['اگر k مرحله و n دستور داشته باشیم، بدون پایپ‌لاین n·k سیکل و با پایپ‌لاین k + n − 1 سیکل لازم است (مرحله‌ها هم‌اندازه و بدون توقف)','برای n بزرگ، سرعت‌افزایی به k نزدیک می‌شود و CPI ایده‌آل به ۱ می‌رسد'],raw:M('Speedup = n·k / (k + n − 1)'),x:'<b>مثال:</b> با n = 1000 و k = 5 سرعت‌افزایی حدود ۴٫۹۸ برابر است. در عمل مخاطرات و توقف‌ها این مقدار را کمتر می‌کنند.'},
+{t:'مخاطرات پایپ‌لاین (Hazards)',raw:C([['ساختاری (Structural)','دو دستور هم‌زمان یک منبع سخت‌افزاری را می‌خواهند، مثل یک حافظه برای واکشی دستور و دسترسی به داده. راه‌حل: تکرار منبع (حافظهٔ جدا برای دستور و داده) یا توقف.'],['داده‌ای (Data)','دستوری به نتیجهٔ دستور قبلی که هنوز آماده نیست نیاز دارد. راه‌حل: Forwarding، توقف و زمان‌بندی کامپایلر.'],['کنترلی (Control)','دستورهای پرش مسیر اجرا را نامعلوم می‌کنند و دستورهای بعدی ممکن است اشتباه واکشی شوند. راه‌حل: پیش‌بینی پرش.']])},
+{t:'مخاطرات داده‌ای و راه‌حل‌ها',s:'B',p:['<b>RAW (خواندن پس از نوشتن)</b> رایج‌ترین است. مثال: <span dir="ltr">add r1, r2, r3</span> و بعد <span dir="ltr">sub r4, r1, r5</span>؛ دستور دوم r1 را می‌خواهد که هنوز نوشته نشده','<b>Forwarding (Bypassing):</b> نتیجهٔ ALU مستقیماً از خروجی یک مرحله به ورودی ALU دستور بعدی می‌رود، بدون انتظار برای WB','<b>توقف (Stall یا Bubble):</b> وقتی forwarding کافی نیست، مثل <b>load-use</b> که بعد از load داده تا مرحلهٔ MEM آماده نیست، یک سیکل حباب وارد می‌شود','<b>زمان‌بندی کامپایلر:</b> جابه‌جایی دستورهای مستقل برای پر کردن فاصله','WAR و WAW در پایپ‌لاین ساده رخ نمی‌دهند، اما در اجرای خارج از ترتیب مطرح‌اند و با تغییر نام ثبات‌ها حل می‌شوند']},
+{t:'مخاطرات کنترلی و پیش‌بینی پرش',p:['تا وقتی شرط پرش محاسبه نشود، پردازنده نمی‌داند دستور بعدی کدام است؛ اگر اشتباه حدس بزند باید دستورهای اشتباه را <b>دور بریزد (Flush)</b>','<b>توقف:</b> ساده ولی کند. <b>پیش‌بینی ایستا:</b> مثلاً «پرش‌های به عقب (حلقه‌ها) انجام می‌شوند»','<b>پیش‌بینی پویا:</b> جدول تاریخچهٔ پرش با شمارنده‌های ۲ بیتی؛ دقت در برنامه‌های واقعی اغلب بسیار بالاست','هزینهٔ پیش‌بینی اشتباه تقریباً برابر عمق پایپ‌لاین است؛ پس هرچه پایپ‌لاین عمیق‌تر باشد، پیش‌بینی دقیق‌تر ضروری‌تر است']},
+{t:'فراتر از پایپ‌لاین ساده',s:'B',p:['<b>سوپراسکالر:</b> چند پایپ‌لاین موازی که در هر سیکل چند دستور را آغاز می‌کنند (CPI کمتر از ۱)','<b>اجرای خارج از ترتیب و اجرای حدسی:</b> دستورهای آماده زودتر اجرا می‌شوند و نتیجه‌ها به ترتیب برنامه تأیید می‌شوند','<b>پایپ‌لاین عمیق‌تر:</b> مرحله‌های کوتاه‌تر و فرکانس بالاتر (پنتیوم ۴ حدود ۲۰ تا ۳۱ مرحله داشت)، اما جریمهٔ پیش‌بینی اشتباه و مصرف توان بیشتر؛ طراحی‌های امروزی میان این دو تعادل برقرار می‌کنند','پایپ‌لاین با چندهسته‌ای مکمل است: پایپ‌لاین در هر هسته، و چند هسته کنار هم']},
+{t:'جمع‌بندی',p:['پایپ‌لاین اجرای دستورها را هم‌پوشان می‌کند و توان عملیاتی را تا حدود k برابر (تعداد مراحل) بالا می‌برد، بدون کم کردن تأخیر هر دستور','مخاطرات ساختاری، داده‌ای و کنترلی مانع رسیدن به سرعت ایده‌آل‌اند و با تکرار منابع، forwarding، توقف و پیش‌بینی پرش مدیریت می‌شوند','پردازنده‌های مدرن این ایده را با سوپراسکالر، اجرای خارج از ترتیب و پیش‌بینی پرش پیشرفته گسترش داده‌اند']}
+];
+var EN=[
+{s:'T',t:'<span class="g">Pipelining in the Processor</span>',sub:'Overlapped instruction execution: the idea, the stages, the hazards and the fixes'},
+{t:'The core idea of pipelining',p:['Split the execution of each instruction into several <b>independent stages</b> and run each stage on its own piece of hardware','While one instruction is in its next stage, the following instruction starts its first stage, so several instructions are in flight at once','<b>Assembly-line (laundry) analogy:</b> if washing, drying and folding each take an hour, three loads take 9 hours without overlap but only 5 with it','The time to finish <b>one</b> instruction (latency) does not shrink, but the number of instructions finished per unit time (throughput) rises']},
+{t:'The classic five-stage RISC pipeline',s:'B',e:C([['IF: instruction fetch','The program counter sends the address to instruction memory (cache), the instruction is read and the PC moves on.'],['ID: decode','The control unit identifies the opcode and the source registers are read from the register file.'],['EX: execute','The ALU performs the arithmetic or logic operation, or builds the memory address (base + offset) for loads and stores, or checks a branch condition.'],['MEM: memory access','A load reads data memory and a store writes to it; other instructions pass through this stage idle.'],['WB: write-back','The ALU result or loaded data is written to the destination register.']]),raw:CH(['IF: instruction fetch','ID: decode and read registers','EX: execute in the ALU or compute the address','MEM: memory access','WB: write the result to a register']),x:'Pipeline registers sit between stages and hold each stage’s result until the next cycle. The clock cycle must equal the slowest stage plus register overhead, so stages should be as equal in length as possible.'},
+{t:'Timing diagram',raw:PT('Cycle'),x:'4 instructions finish in 8 cycles; without pipelining 20 cycles (4×5) would be needed. From cycle 5 on, one instruction completes every cycle.'},
+{t:'Measuring the improvement',s:'B',p:['With k stages and n instructions, no pipelining takes n·k cycles and pipelining takes k + n − 1 cycles (equal stages, no stalls)','For large n the speedup approaches k and the ideal CPI approaches 1'],raw:M('Speedup = n·k / (k + n − 1)'),x:'<b>Example:</b> with n = 1000 and k = 5 the speedup is about 4.98×. In practice hazards and stalls reduce this.'},
+{t:'Pipeline hazards',raw:C([['Structural','Two instructions need the same hardware at once, such as one memory for instruction fetch and data access. Fix: duplicate the resource (separate instruction and data memories) or stall.'],['Data','An instruction needs the result of an earlier one that is not ready yet. Fix: forwarding, stalls and compiler scheduling.'],['Control','Branches make the next instruction unknown, so wrong instructions may be fetched. Fix: branch prediction.']])},
+{t:'Data hazards and their fixes',s:'B',p:['<b>RAW (read after write)</b> is the most common. Example: <span dir="ltr">add r1, r2, r3</span> then <span dir="ltr">sub r4, r1, r5</span>; the second needs r1 before it is written','<b>Forwarding (bypassing):</b> the ALU result goes straight from one stage’s output to the next instruction’s ALU input, without waiting for WB','<b>Stall (bubble):</b> when forwarding is not enough, as in a <b>load-use</b> case where loaded data is not ready until the MEM stage, one bubble cycle is inserted','<b>Compiler scheduling:</b> reorder independent instructions to fill the gap','WAR and WAW do not occur in a simple pipeline but matter in out-of-order execution and are solved by register renaming']},
+{t:'Control hazards and branch prediction',p:['Until the branch condition is computed, the CPU does not know the next instruction; if it guesses wrong it must <b>flush</b> the wrong instructions','<b>Stalling:</b> simple but slow. <b>Static prediction:</b> for example “backward branches (loops) are taken”','<b>Dynamic prediction:</b> a branch history table with 2-bit counters; accuracy on real programs is often very high','A misprediction costs roughly the pipeline depth, so the deeper the pipeline, the more accurate the predictor must be']},
+{t:'Beyond the simple pipeline',s:'B',p:['<b>Superscalar:</b> several parallel pipelines start multiple instructions per cycle (CPI below 1)','<b>Out-of-order and speculative execution:</b> ready instructions run early and results are committed in program order','<b>Deeper pipelines:</b> shorter stages and higher frequency (the Pentium 4 had about 20 to 31 stages), but a bigger misprediction penalty and more power; modern designs balance the two','Pipelining complements multi-core: a pipeline inside each core, and several cores side by side']},
+{t:'Summary',p:['Pipelining overlaps instruction execution and raises throughput by up to about k times (the number of stages) without reducing each instruction’s latency','Structural, data and control hazards keep it from the ideal speed and are handled by duplicated resources, forwarding, stalls and branch prediction','Modern processors extend the idea with superscalar execution, out-of-order execution and advanced branch prediction']}
+];
+var REF=[['v','Crash Course Computer Science #9: Advanced CPU Designs','https://www.youtube.com/watch?v=rtAlC5J1U40'],['v','Crash Course Computer Science #7: The Central Processing Unit (CPU)','https://www.youtube.com/watch?v=FZGugFqdr60'],['w','Wikipedia: Instruction pipelining','https://en.wikipedia.org/wiki/Instruction_pipelining'],['w','Wikipedia: Classic RISC pipeline','https://en.wikipedia.org/wiki/Classic_RISC_pipeline'],['b','Patterson & Hennessy, Computer Organization and Design (Morgan Kaufmann)',''],['b','Hennessy & Patterson, Computer Architecture: A Quantitative Approach (Morgan Kaufmann)','']];
+
+var lang='fa',i=0,n=0,el,d=document.getElementById('deck'),bar=document.getElementById('bar'),cnt=document.getElementById('count'),pv=document.getElementById('prev'),nx=document.getElementById('next'),lg=document.getElementById('lg');
+function build(){
+ var t=T[lang],S=(lang==='fa'?FA:EN).concat([{s:'R'}]),h=document.documentElement;
+ h.lang=lang;h.dir=lang==='fa'?'rtl':'ltr';n=S.length;d.innerHTML='';
+ S.forEach(function(o){var e=document.createElement('section');e.className='slide';e.dataset.s=o.s||'A';
+  e.innerHTML=o.s==='T'?'<h1>'+o.t+'</h1><div class="sub">'+o.sub+'</div>':o.s==='R'?'<h1><span class="g">'+t.thx+'</span></h1><div class="rh">'+t.ref+'</div><div class="refs">'+REF.map(function(r){var x='<b>'+t[r[0]]+'</b><span dir="ltr">'+r[1]+'</span>';return r[2]?'<a href="'+r[2]+'" target="_blank" rel="noopener">'+x+'<i>'+r[2].replace(/^https?:\/\/(www\.)?/,'')+'</i></a>':'<div>'+x+'</div>'}).join('')+'</div>':'<h2>'+o.t+'</h2>'+(o.p?'<ul>'+o.p.map(function(x,k){return '<li style="--i:'+k+'">'+x+'</li>'}).join('')+'</ul>':'')+(o.raw||'')+(o.e||'')+(o.x?'<div class="ex">'+o.x+'</div>':'');
+  d.appendChild(e)});
+ el=d.children;lg.textContent=t.tog;pv.textContent=t.pv;nx.textContent=t.nx;pv.setAttribute('aria-label',t.pvl);nx.setAttribute('aria-label',t.nxl);
+go(i)}
+function go(k){i=Math.max(0,Math.min(n-1,k));for(var j=0;j<n;j++)el[j].className='slide'+(j===i?' on':j<i?' past':'');bar.style.width=((i+1)/n*100)+'%';cnt.textContent=(i+1).toLocaleString(lang)+' / '+n.toLocaleString(lang)}
+nx.onclick=function(){go(i+1)};pv.onclick=function(){go(i-1)};
+lg.onclick=function(){lang=lang==='fa'?'en':'fa';build()};
+document.addEventListener('keydown',function(e){var fa=lang==='fa';
+ if(['ArrowDown','PageDown',' ',fa?'ArrowLeft':'ArrowRight'].indexOf(e.key)>-1){e.preventDefault();go(i+1)}
+ if(['ArrowUp','PageUp',fa?'ArrowRight':'ArrowLeft'].indexOf(e.key)>-1){e.preventDefault();go(i-1)}
+ if(e.key==='Home')go(0);if(e.key==='End')go(n-1)});
+var x0=null;
+document.addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50)go(i+((dx<0)===(lang!=='fa')?1:-1));x0=null});
+build();
+</script>
+</body>
+</html>
